@@ -5,9 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class MainApplication {
-
 	public static void main(String[] args) {
+		System.out.println("=== Main started ===");
 		SpringApplication.run(MainApplication.class, args);
 	}
-
 }

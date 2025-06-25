@@ -1,0 +1,52 @@
+{
+  "java.jdt.ls.java.home": "C:/Program Files/Java/jdk-24.0.1",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-24",
+      "path": "C:/Program Files/Java/jdk-24.0.1",
+      "default": true
+    }
+  ],
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.import.gradle.version": "wrapper",
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.project.sourcePaths": [
+    "src/main/java"
+  ],
+  "java.project.outputPath": "build/classes",
+  "gradle.allowParallelRun": true,
+  "gradle.buildFile": "build.gradle",
+  "gradle.wrapperEnabled": true,
+  "java.server.launchMode": "Standard",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.watcherExclude": {
+    "**/build/**": true,
+    "**/target/**": true,
+    "**/node_modules/**": true
+  },
+  "java.errors.incompleteClasspath.severity": "warning",
+  "java.referencesCodeLens.enabled": true,
+  "java.completion.imports.enabled": true,
+  "java.completion.imports.favoriteStaticMembers": [],
+  "java.completion.importOrder": [
+    "java",
+    "javax",
+    "org",
+    "com"
+  ],
+  "java.codeGeneration.imports.insertMissingImports": true,
+  "java.completion.favorites": [
+    "org.springframework.stereotype.*",
+    "org.springframework.beans.factory.annotation.*",
+    "jakarta.persistence.*",
+    "lombok.*"
+  ],
+  "java.implementationsCodeLens.enabled": true,
+}

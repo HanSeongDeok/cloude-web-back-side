@@ -28,7 +28,6 @@ public class FileService {
 
         // 파일 ID 생성
         String fileId = UUID.randomUUID().toString();
-
         Long fileSize = 0L;
         try {
             fileSize = Long.parseLong(fileData.getFileSize().toString());

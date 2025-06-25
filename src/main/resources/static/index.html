@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot 애플리케이션</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .status {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        .api-links {
+            margin-top: 30px;
+        }
+
+        .api-links a {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .api-links a:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎉 Spring Boot 애플리케이션</h1>
+        <div class="status">
+            ✅ 정적 리소스가 성공적으로 로드되었습니다!
+        </div>
+        <p>
+            이 페이지는 <code>src/main/resources/static/index.html</code>에서 제공됩니다.
+            Spring Boot의 정적 리소스 처리 기능이 정상적으로 작동하고 있습니다.
+        </p>
+
+        <div class="api-links">
+            <h3>API 엔드포인트 테스트:</h3>
+            <a href="/api/test" target="_blank">테스트 API</a>
+            <a href="/api/files" target="_blank">파일 API</a>
+            <a href="/h2-console" target="_blank">H2 데이터베이스 콘솔</a>
+        </div>
+
+        <div style="margin-top: 30px; font-size: 0.9em; color: #888;">
+            <p>서버 포트: 8080</p>
+            <p>애플리케이션 이름: Main</p>
+        </div>
+    </div>
+</body>
+
+</html>

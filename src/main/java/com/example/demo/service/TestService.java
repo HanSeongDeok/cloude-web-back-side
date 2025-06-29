@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class TestService {
     public String test() {
         testRepository.save(TestEntity.builder()
                 .id(name + UUID.randomUUID().toString())
+                .data(Map.of("name", name, "age", 29))
                 .build());
         return "Hello, " + name;
     }

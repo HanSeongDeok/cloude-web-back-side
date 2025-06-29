@@ -17,8 +17,6 @@
   ],
   "java.project.outputPath": "build/classes",
   "gradle.allowParallelRun": true,
-  "gradle.buildFile": "build.gradle",
-  "gradle.wrapperEnabled": true,
   "java.server.launchMode": "Standard",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
@@ -33,20 +31,10 @@
   },
   "java.errors.incompleteClasspath.severity": "warning",
   "java.referencesCodeLens.enabled": true,
-  "java.completion.imports.enabled": true,
-  "java.completion.imports.favoriteStaticMembers": [],
   "java.completion.importOrder": [
     "java",
     "javax",
     "org",
     "com"
   ],
-  "java.codeGeneration.imports.insertMissingImports": true,
-  "java.completion.favorites": [
-    "org.springframework.stereotype.*",
-    "org.springframework.beans.factory.annotation.*",
-    "jakarta.persistence.*",
-    "lombok.*"
-  ],
-  "java.implementationsCodeLens.enabled": true,
 }

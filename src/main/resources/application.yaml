@@ -3,22 +3,30 @@ spring:
     name: Main
 
   # H2 Database 설정
-  datasource:
-    # url: jdbc:h2:mem:testdb
-    url: jdbc:h2:file:./data/testdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
+  # datasource:
+  #   # url: jdbc:h2:mem:testdb
+  #   url: jdbc:h2:file:./data/testdb
+  #   driverClassName: org.h2.Driver
+  #   username: sa
+  #   password:
 
-  # H2 Console 활성화
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  # # H2 Console 활성화
+  # h2:
+  #   console:
+  #     enabled: true
+  #     path: /h2-console
+
+  # PostgreSQL 설정
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: 1234
 
   # JPA 설정
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    #database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -29,24 +37,18 @@ spring:
   # DevTools 설정
   devtools:
     restart:
-      enabled: true
-      additional-paths: src/main/java
-      exclude: static/**,public/**,templates/**
-      poll-interval: 2s
-      quiet-period: 1s
-    livereload:
-      enabled: true
+      enabled: false
 
   # 서버 포트 설정
-  server:
-    port: 8080
+server:
+  port: 8080
 
   # 로깅 설정
-  logging:
-    level:
-      com.example.demo: DEBUG
-      org.springframework.boot.devtools: DEBUG
-      org.springframework.web.servlet.resource: DEBUG
+logging:
+  level:
+    com.example.demo: DEBUG
+    org.springframework.boot.devtools: DEBUG
+    org.springframework.web.servlet.resource: DEBUG
 
 my:
   name: HanSeongDeok

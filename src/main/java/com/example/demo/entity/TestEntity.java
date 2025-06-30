@@ -8,7 +8,6 @@ import org.hibernate.type.SqlTypes;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,9 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "test", indexes = {
-        @Index(name = "idx_test_data_gin", columnList = "data", unique = false)
-})
+@Table(name = "test")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

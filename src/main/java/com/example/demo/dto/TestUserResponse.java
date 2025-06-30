@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 public class TestUserResponse {
     private boolean success;
     private String message;
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }

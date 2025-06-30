@@ -7,4 +7,5 @@ import com.example.demo.entity.TestUserEntity;
 
 @Repository
 public interface TestUserRepository extends JpaRepository<TestUserEntity, String> {
+    TestUserEntity findFirstByCreatedAtIsNotNullOrderByCreatedAtDesc();
 }

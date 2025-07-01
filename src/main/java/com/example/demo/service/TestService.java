@@ -39,7 +39,7 @@ public class TestService {
     public String test() {
         testRepository.save(TestEntity.builder()
                 .id(name + UUID.randomUUID().toString())
-                .data(Map.of("name", name, "age", 29, "email", "test@test.com"))
+                .data(Map.of("name", name, "age", 30, "email", "test2@test.com"))
                 .build());
         return "Hello, " + name;
     }
@@ -62,7 +62,54 @@ public class TestService {
         return this;
     }
 
-    public TestUserResponse getTestUser() {
+    public TestService saveTestFolder() {
+        String folderId = name + UUID.randomUUID().toString();
+
+        testRepository.save(TestEntity.builder()
+                .id(folderId)
+                .fileName("test_01")
+                .fileType("folder")
+                .isFolder(true)
+                .parentId(null)
+                .size(null)
+                .filePath("Localhost/test_01")
+                .data(Map.of("name", "Han Seong Deok", "type", "folder"))
+                .build());
+        // 하위 파일 1
+        testRepository.save(TestEntity.builder()
+                .id("file_" + UUID.randomUUID())
+                .fileName("readme.txt")
+                .fileType("txt")
+                .isFolder(false)
+                .parentId(folderId)
+                .size(1024L)
+                .filePath("Localhost/test_01/readme.txt")
+                .data(Map.of("description", "sample text file", "author", "admin"))
+                .build());
+        // 하위 파일 2
+        testRepository.save(TestEntity.builder()
+                .id("file_" + UUID.randomUUID())
+                .fileName("image.png")
+                .fileType("png")
+                .isFolder(false)
+                .parentId(folderId)
+                .size(204800L)
+                .filePath("Localhost/test_01/image.png")
+                .data(Map.of("resolution", "1024x768", "author", "admin"))
+                .build());
+        return this;
+    }
+
+    public TestUserResponse getTestResp() {
+        LocalDateTime date = testRepository.findFirstByCreatedAtIsNotNullOrderByCreatedAtDesc().getCreatedAt();
+        return TestUserResponse.builder()
+                .success(true)
+                .message("Success")
+                .createdAt(date)
+                .build();
+    }
+
+    public TestUserResponse getTestUserResp() {
         LocalDateTime date = testUserRepository.findFirstByCreatedAtIsNotNullOrderByCreatedAtDesc().getCreatedAt();
         return TestUserResponse.builder()
                 .success(true)

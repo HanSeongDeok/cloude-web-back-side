@@ -26,6 +26,24 @@ public class TestEntity extends BaseTimeEntity {
     @Id
     private String id;
 
+    @Column
+    private String fileName;
+
+    @Column
+    private String parentId;
+
+    @Column
+    private String fileType;
+
+    @Column
+    private boolean isFolder;
+
+    @Column
+    private Long size;
+
+    @Column
+    private String filePath;
+
     // JSONB 형태로 저장될 필드 (GIN 인덱스 적용)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

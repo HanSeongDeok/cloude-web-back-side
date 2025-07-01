@@ -40,7 +40,7 @@ public class TestController {
         try {
             return ResponseEntity.ok(testService
                     .saveTestUser(request)
-                    .getTestUser());
+                    .getTestUserResp());
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(TestUserResponse.builder()
@@ -48,6 +48,13 @@ public class TestController {
                             .message("Fail: " + e.getMessage())
                             .build());
         }
+    }
+
+    @GetMapping("/test-foler")
+    public ResponseEntity<TestUserResponse> testFolder() {
+        return ResponseEntity.ok(testService
+                .saveTestFolder()
+                .getTestResp());
     }
 
     @DeleteMapping("/test-delete/{id}")

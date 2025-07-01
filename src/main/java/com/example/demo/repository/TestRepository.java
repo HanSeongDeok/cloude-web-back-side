@@ -14,4 +14,5 @@ public interface TestRepository extends JpaRepository<TestEntity, String> {
     // JSONB 필드에서 특정 키-값 쌍으로 검색 (GIN 인덱스 활용)
     @Query(value = "SELECT * FROM test WHERE data @> CAST(:jsonCondition AS jsonb)", nativeQuery = true)
     List<TestEntity> findByDataContains(@Param("jsonCondition") String jsonCondition);
+    TestEntity findFirstByCreatedAtIsNotNullOrderByCreatedAtDesc();
 }

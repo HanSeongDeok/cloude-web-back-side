@@ -70,4 +70,34 @@ public class TestService {
                 .createdAt(date)
                 .build();
     }
+
+    // TestEntity 삭제 메서드
+    public void deleteTestEntity(String id) {
+        testRepository.deleteById(id);
+        log.info("TestEntity deleted with id: {}", id);
+    }
+
+    // TestEntity 업데이트 메서드
+    public TestEntity updateTestEntity(String id, Map<String, Object> newData) {
+        TestEntity existingEntity = testRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("TestEntity not found with id: " + id));
+
+        existingEntity.setData(newData);
+        TestEntity updatedEntity = testRepository.save(existingEntity);
+        log.info("TestEntity updated with id: {}", id);
+        return updatedEntity;
+    }
+
+    // 모든 TestEntity 삭제 메서드
+    public void deleteAllTestEntities() {
+        testRepository.deleteAll();
+        log.info("All TestEntities deleted");
+    }
+
+    // 조건에 맞는 TestEntity 삭제 메서드
+    public void deleteTestEntitiesByCondition(String jsonCondition) {
+        List<TestEntity> entitiesToDelete = testRepository.findByDataContains(jsonCondition);
+        testRepository.deleteAll(entitiesToDelete);
+        log.info("Deleted {} TestEntities matching condition: {}", entitiesToDelete.size(), jsonCondition);
+    }
 }

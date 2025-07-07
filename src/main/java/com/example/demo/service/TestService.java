@@ -13,6 +13,7 @@ import com.example.demo.dto.TestUserRequest;
 import com.example.demo.dto.TestUserResponse;
 import com.example.demo.entity.TestEntity;
 import com.example.demo.entity.TestUserEntity;
+import com.example.demo.repository.TestFileRepository;
 import com.example.demo.repository.TestRepository;
 import com.example.demo.repository.TestUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,20 +26,24 @@ public class TestService {
     private final String name;
     private final TestUserRepository testUserRepository;
     private final TestRepository testRepository;
+    private final TestFileRepository testFileRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public TestService(@Value("${my.name:Han}") String name,
             TestUserRepository testUserRepository,
-            TestRepository testRepository) {
+            TestRepository testRepository,
+            TestFileRepository testFileRepository) {
         this.name = name;
         this.testUserRepository = testUserRepository;
         this.testRepository = testRepository;
+        this.testFileRepository = testFileRepository;
     }
 
     public String test() {
         testRepository.save(TestEntity.builder()
                 .id(name + UUID.randomUUID().toString())
+                .isFolder(false)
                 .data(Map.of("name", name, "age", 30, "email", "test2@test.com"))
                 .build());
         return "Hello, " + name;
@@ -67,34 +72,31 @@ public class TestService {
 
         testRepository.save(TestEntity.builder()
                 .id(folderId)
-                .fileName("test_01")
-                .fileType("folder")
+                .folderName("test_01")
                 .isFolder(true)
-                .parentId(null)
-                .size(null)
-                .filePath("Localhost/test_01")
+                .folderPath("Localhost/test_01")
                 .data(Map.of("name", "Han Seong Deok", "type", "folder"))
                 .build());
         // 하위 파일 1
         testRepository.save(TestEntity.builder()
                 .id("file_" + UUID.randomUUID())
+                .isFolder(false)
+                .filePath("Localhost/test_01/readme.txt")
                 .fileName("readme.txt")
                 .fileType("txt")
-                .isFolder(false)
-                .parentId(folderId)
+                .parentFolder(folderId)
                 .size(1024L)
-                .filePath("Localhost/test_01/readme.txt")
                 .data(Map.of("description", "sample text file", "author", "admin"))
                 .build());
         // 하위 파일 2
         testRepository.save(TestEntity.builder()
                 .id("file_" + UUID.randomUUID())
+                .isFolder(false)
+                .filePath("Localhost/test_01/image.png")
                 .fileName("image.png")
                 .fileType("png")
-                .isFolder(false)
-                .parentId(folderId)
+                .parentFolder(folderId)
                 .size(204800L)
-                .filePath("Localhost/test_01/image.png")
                 .data(Map.of("resolution", "1024x768", "author", "admin"))
                 .build());
         return this;

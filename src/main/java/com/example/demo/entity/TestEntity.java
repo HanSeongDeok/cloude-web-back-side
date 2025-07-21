@@ -38,6 +38,21 @@ public class TestEntity extends BaseTimeEntity {
     @Column
     private Boolean isFolder;
 
+    @Column
+    private String fileName;
+
+    @Column
+    private String filePath;
+
+    @Column
+    private String fileType;
+
+    @Column
+    private Long size;
+
+    @Column
+    private String parentFolder;
+
     // 폴더에 포함된 파일들과의 관계
     @OneToMany(mappedBy = "parentFolder", fetch = FetchType.LAZY)
     private List<TestFileEntity> files;

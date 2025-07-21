@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.entity.ColumnNamesEntity;
+import com.example.demo.entity.DataTableEntity;
 import com.example.demo.entity.TestEntity;
 import com.example.demo.repository.ColumnNamesRepository;
 import com.example.demo.repository.DataTableRepository;
@@ -49,9 +50,44 @@ public class DBInitializer {
     }
 
     @PostConstruct
+    public void dataTableInit() {
+        try {
+            // dataTableRepository.deleteAll();
+            if (dataTableRepository.findAll().isEmpty()) {
+                dataTableRepository.save(DataTableEntity.builder()
+                        .tableNumber("1")
+                        .fileName("test.csv")
+                        .filePath("C:/test.csv")
+                        .fileSize(100L)
+                        .fileFormat("csv")
+                        .fileModifiedDate("2021-01-01")
+                        .fileCreator("test")
+                        .deliverableType("test")
+                        .testType("test")
+                        .vehicle("test")
+                        .driveType("test")
+                        .devStep("test")
+                        .ecu("test")
+                        .testItem("test")
+                        .testResult(true)
+                        .tcNum("test")
+                        .swVer("test")
+                        .description("test")
+                        .memType("test")
+                        .depArr("test")
+                        .customColumns(new HashMap<>())
+                        .build());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @PostConstruct
     public void initColumnNames() {
         // @NOTE: 변경 하고 싶을 시 사용
-        // columnNamesRepository.deleteAll();
+        columnNamesRepository.deleteAll();
         try {
             if (columnNamesRepository.findAll().isEmpty()) {
                 Map<String, String> columnNames = new LinkedHashMap<>();
@@ -59,9 +95,9 @@ public class DBInitializer {
                 columnNames.put("filePath", "파일저장경로");
                 columnNames.put("fileSize", "용량");
                 columnNames.put("fileFormat", "형식");
-                columnNames.put("fileModifiedDate", "최종수정날짜");
+                columnNames.put("fileModifiedDate", "파일생성일");
                 columnNames.put("fileCreator", "등록자");
-                columnNames.put("registrationNumber", "등록번호");
+                columnNames.put("tableNumber", "등록번호");
                 columnNames.put("deliverableType", "산출물분류");
                 columnNames.put("testType", "시험분류");
                 columnNames.put("vehicle", "차종");
@@ -75,8 +111,8 @@ public class DBInitializer {
                 columnNames.put("description", "산출물설명");
                 columnNames.put("memType", "메모리타입");
                 columnNames.put("depArr", "출발지-도착지");
-                columnNames.put("fileCreatedAt", "파일생성일");
-                columnNames.put("createdAt", "생성일");
+                columnNames.put("createdAt", "최초등록날짜");
+                columnNames.put("updatedAt", "최종수정날짜");
 
                 columnNamesRepository.save(ColumnNamesEntity.builder()
                         .columnNames(columnNames)

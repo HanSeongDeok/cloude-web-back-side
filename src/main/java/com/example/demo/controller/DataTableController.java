@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.entity.DataTableEntity;
 import com.example.demo.service.DataTableService;
 
 @RestController
-@RequestMapping("/data-table")
+@RequestMapping("/api/data-table")
 @CrossOrigin(origins = "*")
 public class DataTableController {
 
@@ -26,5 +28,10 @@ public class DataTableController {
     @GetMapping("/columns")
     public ResponseEntity<Map<String, String>> getDataTable() {
         return ResponseEntity.ok(dataTableService.getDataTableColumns());
+    }
+
+    @GetMapping("/all-data")
+    public ResponseEntity<List<DataTableEntity>> getAllDataTable() {
+        return ResponseEntity.ok(dataTableService.getAllDataTable());
     }
 }

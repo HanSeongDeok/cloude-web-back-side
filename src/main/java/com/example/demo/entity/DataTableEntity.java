@@ -91,5 +91,5 @@ public class DataTableEntity extends BaseTimeEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private Map<String, Object> customColumns;
+    private Map<String, String> customColumns;
 }

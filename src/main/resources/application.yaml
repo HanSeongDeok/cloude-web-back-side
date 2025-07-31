@@ -22,6 +22,13 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: 1234
+    hikari:
+      maximum-pool-size: 100  # 100 VU 대응
+      minimum-idle: 20
+      connection-timeout: 10000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 30000
 
   # JPA 설정
   jpa:
@@ -47,9 +54,23 @@ server:
 logging:
   level:
     com.example.demo: DEBUG
-    org.springframework.boot.devtools: DEBUG
-    org.springframework.web.servlet.resource: DEBUG
+    com.example.demo.controller: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
 
 my:
   name: HanSeongDeok
   age: 29
+
+# OAuth2 설정
+oauth2:
+  google:
+    client-id:    # 실제 Google OAuth 클라이언트 ID (절대 공유 금지)
+    client-secret:   # 실제 Google OAuth 클라이언트 시크릿 (절대 공유 금지)
+    redirect-uri: http://localhost:8080/api/auth/google/callback
+    frontend-redirect-uri: http://localhost:5173/save-token
+
+# JWT 설정
+jwt:
+  secret: your-super-secret-jwt-key-here-make-it-long-and-secure  # 실제 JWT 시크릿 키
+  expiration: 86400000 # 24시간 (밀리초)

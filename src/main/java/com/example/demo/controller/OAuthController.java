@@ -1,18 +1,29 @@
 package com.example.demo.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.GoogleTokenResponse;
 import com.example.demo.entity.UserEntity;
 import com.example.demo.service.GoogleOAuthService;
 import com.example.demo.service.JwtService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 @Slf4j
 public class OAuthController {
     private final GoogleOAuthService googleOAuthService;
@@ -51,45 +61,68 @@ public class OAuthController {
     public void handleGoogleCallback(@RequestParam("code") String code,
             HttpServletResponse response) throws IOException {
         try {
-            log.info("Google OAuth 콜백 수신: code={}", code);
+            GoogleTokenResponse idToken = Optional.ofNullable(googleOAuthService.getIdToken(code))
+                    .orElseThrow(() -> new RuntimeException("Google ID token 획득 실패"));
 
-            // 1. access_token 요청
-            String accessToken = googleOAuthService.getAccessToken(code);
-            if (accessToken == null) {
-                log.error("Google access token 획득 실패");
-                response.sendRedirect(frontendRedirectUri + "?error=auth_failed");
-                return;
-            }
+            Map<String, Object> userInfo = googleOAuthService.getUserInfo(idToken.getAccess_token());
+            UserEntity user = googleOAuthService.processUserLogin(userInfo);
 
-            // 2. 유저 정보 가져오기
-            Map<String, Object> userInfo = googleOAuthService.getUserInfo(accessToken);
-            if (userInfo == null) {
-                log.error("Google user info 획득 실패");
-                response.sendRedirect(frontendRedirectUri + "?error=user_info_failed");
-                return;
-            }
+            String newAccessToken = jwtService.createToken(user.getEmail());
+            idToken.setAccess_token(newAccessToken);
 
-            // 3. 사용자 처리 (생성 또는 업데이트)
-            googleOAuthService.processUserLogin(userInfo);
+            // accessToken과 refreshToken을 쿠키로 설정
+            Cookie accessTokenCookie = new Cookie("accessToken", idToken.getAccess_token());
+            accessTokenCookie.setHttpOnly(true);
+            accessTokenCookie.setPath("/");
+            // 필요에 따라 Secure 옵션 추가
+            // accessTokenCookie.setSecure(true);
 
-            // 4. JWT 생성
-            String email = (String) userInfo.get("email");
-            String jwt = jwtService.createToken(email);
+            Cookie refreshTokenCookie = new Cookie("refreshToken", idToken.getRefresh_token());
+            refreshTokenCookie.setHttpOnly(true);
+            refreshTokenCookie.setPath("/");
+            // refreshTokenCookie.setSecure(true);
 
-            // 5. 프론트엔드로 리다이렉트
-            String redirectUrl = frontendRedirectUri + "?jwt=" + jwt;
-            log.info("JWT 토큰과 함께 프론트엔드로 리다이렉트: {}", redirectUrl);
-            response.sendRedirect(redirectUrl);
-
+            response.addCookie(accessTokenCookie);
+            response.addCookie(refreshTokenCookie);
+            response.sendRedirect(frontendRedirectUri + "?success=true");
         } catch (Exception e) {
             log.error("Google OAuth 처리 중 오류 발생: {}", e.getMessage(), e);
             response.sendRedirect(frontendRedirectUri + "?error=server_error");
         }
     }
 
+    @GetMapping("/permission/V2")
+    public ResponseEntity<?> getPermission(Authentication auth, HttpServletRequest request) {
+        try {
+            Cookie[] cookies = Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]);
+            String token = Arrays.stream(cookies)
+                    .filter(cookie -> cookie.getName().equals("accessToken"))
+                    .findFirst().map(Cookie::getValue)
+                    .orElseThrow(() -> new RuntimeException("Token not found"));
+
+            String email = jwtService.getEmailFromToken(token);
+            UserEntity user = googleOAuthService.getUser(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            return ResponseEntity.ok(Map.of(
+                    "hasPermission", user.isHasPermission(),
+                    "isRequesting", user.isRequesting(),
+                    "role", user.getRole().name(),
+                    "name", user.getName(),
+                    "picture", user.getPicture(),
+                    "email", user.getEmail()));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                    "code", "AUTH_ERROR",
+                    "message", "인증 오류가 발생했습니다."));
+        }
+    }
+
     @PostMapping("/permission")
     public ResponseEntity<?> getPermission(@RequestBody Map<String, String> request) {
-        try {            String email = request.get("email");
+        try {
+            String email = request.get("email");
 
             if (email == null || email.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of(
@@ -118,6 +151,21 @@ public class OAuthController {
                     "isRequesting", false,
                     "error", "Internal server error"));
         }
+    }
+
+    @PutMapping("/permission/request/V2")
+    public ResponseEntity<Map<String, Object>> requestPermission(Authentication auth) {
+        String email = auth.getName();
+        UserEntity user = googleOAuthService.getUser(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRequesting(true);
+        googleOAuthService.saveUser(user);
+        return ResponseEntity.ok().body(Map.of(
+                "success", true,
+                "email", email,
+                "isRequesting", user.isRequesting(),
+                "hasPermission", user.isHasPermission(),
+                "role", user.getRole().name()));
     }
 
     @PutMapping("/permission/request")

@@ -4,10 +4,15 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import com.example.demo.dto.GoogleTokenResponse;
 import com.example.demo.entity.UserEntity;
 import com.example.demo.repository.UserRepository;
 
@@ -19,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GoogleOAuthService {
     private final UserRepository userRepository;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final WebClient webClient;
 
     @Value("${oauth2.google.client-id}")
     private String clientId;
@@ -30,44 +35,54 @@ public class GoogleOAuthService {
     @Value("${oauth2.google.redirect-uri}")
     private String redirectUri;
 
-    public String getAccessToken(String code) {
+    public GoogleTokenResponse getIdToken(String code) {
         String tokenUrl = "https://oauth2.googleapis.com/token";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        String body = String.format(
-                "client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=%s",
-                clientId, clientSecret, code, redirectUri);
-
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("code", code);
+        body.add("grant_type", "authorization_code");
+        body.add("redirect_uri", redirectUri);
 
         try {
-            ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
-            Map<String, Object> responseBody = response.getBody();
+            GoogleTokenResponse response = webClient.post()
+                    .uri(tokenUrl)
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(BodyInserters.fromFormData("client_id", clientId)
+                            .with("client_secret", clientSecret)
+                            .with("code", code)
+                            .with("grant_type", "authorization_code")
+                            .with("redirect_uri", redirectUri))
+                    .retrieve()
+                    .bodyToMono(GoogleTokenResponse.class)
+                    .block(); // 동기적으로 실행
 
-            if (responseBody != null && responseBody.containsKey("access_token")) {
-                return (String) responseBody.get("access_token");
+            if (response != null && response.getId_token() != null) {
+                return response;
             }
         } catch (Exception e) {
-            log.error("Google access token 요청 실패: {}", e.getMessage());
+            log.error("Google ID token 요청 실패: {}", e.getMessage());
         }
 
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getUserInfo(String accessToken) {
         String userInfoUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-
-        HttpEntity<String> request = new HttpEntity<>(headers);
-
         try {
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    userInfoUrl, HttpMethod.GET, request, Map.class);
-            return response.getBody();
+            Map<String, Object> userInfo = webClient.get()
+                    .uri(userInfoUrl)
+                    .headers(headers -> headers.setBearerAuth(accessToken))
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+
+            return userInfo;
         } catch (Exception e) {
             log.error("Google user info 요청 실패: {}", e.getMessage());
             return null;
